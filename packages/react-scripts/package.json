@@ -1,6 +1,6 @@
 {
-  "name": "react-scripts",
-  "version": "4.0.1",
+  "name": "react-scripts-more-than-less",
+  "version": "4.0.1-forked.1",
   "description": "Configuration and scripts for Create React App.",
   "repository": {
     "type": "git",
@@ -41,6 +41,8 @@
     "bfj": "^7.0.2",
     "camelcase": "^6.1.0",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
+    "classnames": "^2.2.6",
+    "classnames-loader": "^2.1.0",
     "css-loader": "4.3.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
@@ -62,6 +64,8 @@
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
+    "less": "^3.12.2",
+    "less-loader": "^7.1.0",
     "mini-css-extract-plugin": "0.11.3",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",

@@ -65,11 +65,29 @@ const useTypeScript = fs.existsSync(paths.appTsConfig);
 // Get the path to the uncompiled service worker (if it exists).
 const swSrc = paths.swSrc;
 
+const envCssRegex = process.env.CSS_REGEX && new RegExp(process.env.CSS_REGEX);
+const envCssModuleRegex = process.env.CSS_MODULE_REGEX && new RegExp(process.env.CSS_MODULE_REGEX);
+const envSassRegex = process.env.SASS_REGEX && new RegExp(process.env.SASS_REGEX);
+const envSassModuleRegex = process.env.SASS_MODULE_REGEX && new RegExp(process.env.SASS_MODULE_REGEX);
+const envLessRegex = process.env.LESS_REGEX && new RegExp(process.env.LESS_REGEX);
+const envLessModuleRegex = process.env.LESS_MODULE_REGEX && new RegExp(process.env.LESS_MODULE_REGEX);
+
 // style files regexes
-const cssRegex = /\.css$/;
-const cssModuleRegex = /\.module\.css$/;
-const sassRegex = /\.(scss|sass)$/;
-const sassModuleRegex = /\.module\.(scss|sass)$/;
+const cssRegex = envCssRegex || /\.css$/;
+const cssModuleRegex = envCssModuleRegex || /\.module\.css$/;
+const sassRegex = envSassRegex || /\.(scss|sass)$/;
+const sassModuleRegex = envSassModuleRegex || /\.module\.(scss|sass)$/;
+const lessRegex = envLessRegex || /\.less$/;
+const lessModuleRegex = envLessModuleRegex || /\.module\.less$/;
+
+console.log(
+    cssRegex,
+    cssModuleRegex,
+    sassRegex,
+    sassModuleRegex,
+    lessRegex,
+    lessModuleRegex,
+);
 
 const hasJsxRuntime = (() => {
   if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
@@ -106,6 +124,9 @@ module.exports = function (webpackEnv) {
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
     const loaders = [
+      process.env.CLASSNAMES_LOADER && cssOptions.modules && {
+        loader: require.resolve('classnames-loader'),
+      },
       isEnvDevelopment && require.resolve('style-loader'),
       isEnvProduction && {
         loader: MiniCssExtractPlugin.loader,
@@ -164,6 +185,10 @@ module.exports = function (webpackEnv) {
     }
     return loaders;
   };
+
+  const getCSSModuleLocalIdentName = () => (
+    isEnvProduction ? '[hash:base64]' : '[path][name]__[local]--[hash:base64:5]'
+  );
 
   return {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
@@ -570,6 +595,31 @@ module.exports = function (webpackEnv) {
                   },
                 },
                 'sass-loader'
+              ),
+            },
+            {
+              test: lessRegex,
+              exclude: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 3,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                },
+                'less-loader'
+              ),
+              sideEffects: true,
+            },
+            {
+              test: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 3,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                  modules: {
+                    getLocalIdent: getCSSModuleLocalIdent,
+                  },
+                },
+                'less-loader'
               ),
             },
             // "file" loader makes sure those assets get served by WebpackDevServer.
